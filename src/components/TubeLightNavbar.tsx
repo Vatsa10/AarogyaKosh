@@ -6,7 +6,7 @@ export default function TubeLightNavbar() {
   const [activeItem, setActiveItem] = useState('Home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navItems = ['Home', 'Convert', 'Pricing', 'About'];
+  const navItems = ['Home', 'About' ,'Experience', 'Projects', 'Contact'];
 
   return (
     <nav className="absolute top-0 left-0 right-0 z-20">
