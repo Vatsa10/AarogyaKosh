@@ -6,17 +6,22 @@ import { Camera, FileText, Calendar, TrendingUp, User } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Profile, Prescription, LabReport } from '@/types';
-import { isAuthenticated, getCurrentUser, logout } from '@/lib/auth-middleware';
+import { isAuthenticated as checkAuth, getCurrentUser, logout } from '@/lib/auth-middleware';
 
 export default function HomePage() {
   const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [labReports, setLabReports] = useState<LabReport[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Check authentication
-    if (!isAuthenticated()) {
+    // Check authentication only on client side
+    const authenticated = typeof window !== 'undefined' && checkAuth();
+    setIsAuthenticated(authenticated);
+    
+    if (!authenticated) {
       router.push('/auth');
       return;
     }
@@ -32,6 +37,8 @@ export default function HomePage() {
 
     const savedLabReports = JSON.parse(localStorage.getItem('labReports') || '[]');
     setLabReports(savedLabReports);
+    
+    setIsLoading(false);
   }, [router]);
 
   const handleProfileSwitch = (profile: Profile) => {
@@ -45,8 +52,16 @@ export default function HomePage() {
 
   const currentUser = getCurrentUser();
 
-  if (!isAuthenticated()) {
-    return null; // Will redirect to auth
+  // Show loading state during hydration and authentication check
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
