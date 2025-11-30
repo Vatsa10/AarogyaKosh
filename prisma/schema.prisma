@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  name      String
+  age       Int
+  gender    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prescriptions Prescription[]
+  labReports    LabReport[]
+  reminders     Reminder[]
+
+  @@map("profiles")
+}
+
+model Prescription {
+  id             String   @id @default(cuid())
+  profileId      String   @map("profile_id")
+  date           String
+  doctor        String
+  diagnosis      String
+  medicines      Json // Array of medicine objects
+  followUpDate   String?  @map("follow_up_date")
+  fileUrl        String   @map("file_url")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("prescriptions")
+}
+
+model LabReport {
+  id       String   @id @default(cuid())
+  profileId String   @map("profile_id")
+  date     String
+  testName String   @map("test_name")
+  values   Json // Array of lab value objects
+  fileUrl  String   @map("file_url")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("lab_reports")
+}
+
+model Reminder {
+  id               String   @id @default(cuid())
+  profileId        String   @map("profile_id")
+  medicineName     String   @map("medicine_name")
+  time             String
+  repeatFrequency  String   @map("repeat_frequency")
+  durationDays     Int      @map("duration_days")
+  completedDays    Int      @default(0) @map("completed_days")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("reminders")
+}

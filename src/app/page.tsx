@@ -1,65 +1,95 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Plus, Camera, FileText, User as UserIcon } from 'lucide-react';
+import AppLayout from '@/components/layout/AppLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Profile } from '@/types';
 
 export default function Home() {
+  const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    const savedCurrent = localStorage.getItem('currentProfile');
+    if (savedCurrent) {
+      setCurrentProfile(JSON.parse(savedCurrent));
+    }
+  }, []);
+
+  if (!currentProfile) {
+    return (
+      <AppLayout>
+        <div className="p-4 text-center">
+          <p>Loading profile...</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <AppLayout currentProfile={currentProfile}>
+      <div className="p-4 space-y-6">
+        {/* Welcome Section */}
+        <div className="text-center py-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome back, {currentProfile.name}!
+          </h2>
+          <p className="text-gray-600">Manage your health records with ease</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Camera className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Upload Prescription</h3>
+              <p className="text-sm text-gray-600 mt-1">Camera or PDF</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FileText className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Upload Lab Report</h3>
+              <p className="text-sm text-gray-600 mt-1">Blood tests & more</p>
+            </CardContent>
+          </Card>
         </div>
-      </main>
-    </div>
+
+        {/* Recent Records */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Recent Records</CardTitle>
+            <CardDescription>Your latest health records</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8 text-gray-500">
+              <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No records yet</p>
+              <p className="text-sm mt-1">Upload your first prescription or lab report</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Reminders */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Today's Reminders</CardTitle>
+            <CardDescription>Medicine reminders for today</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8 text-gray-500">
+              <Plus className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No reminders for today</p>
+              <p className="text-sm mt-1">Upload prescriptions to auto-generate reminders</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
   );
 }
