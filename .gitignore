@@ -1,6 +1,0 @@
-node_modules
-.next
-todo.md
-tasks.md
-/src/generated/prisma
-.env
