@@ -64,7 +64,8 @@ The system follows a microservices-ready architecture, containerized with Docker
 
 * Node.js & npm
 * Python 3.10+
-* Docker & Docker Compose
+* **[uv](https://docs.astral.sh/uv/)** (Recommended for fast Python setup)
+* Docker & Docker Compose (Optional)
 * MongoDB Atlas URI
 
 ###  Clone the Repository
@@ -93,26 +94,50 @@ Configure API URL: Create a new file named .env inside the mobile/ folder and ad
 EXPO_PUBLIC_API_URL=[http://192.168.1.5:8000](http://192.168.1.5:8000)
 ```
 
-### 1. Backend (Docker)
+### 1. Backend (Native with uv - Recommended)
 
-The Docker build will install PyTorch and Transformers for local inference.
+If you don't want to use Docker, you can use `uv` for a fast, isolated setup.
+
+```bash
+cd backend
+
+# Create a virtual environment and install dependencies
+uv venv
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+
+uv pip install -r requirements.txt
+```
+
+**System Dependencies (Windows):**
+- **Tesseract OCR:** Download and install from [UB-Mannheim](https://github.com/UB-Mannheim/tesseract/wiki).
+- **Poppler:** Download [binaries](https://github.com/oschwartz10612/poppler-windows/releases/) and add the `bin/` folder to your System PATH.
+
+**Run Backend:**
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+### 2. Backend (Docker)
+
+The Docker build installs all system dependencies automatically.
 
 ```bash
 cd backend
 docker build -t AarogyaKosh-backend .
 docker run -p 8000:8000 --env-file .env AarogyaKosh-backend
-
 ```
 
-*Note: The first run may take time to download the MedGamma model weights to the container.*
+*Note: The first run will download the MedGamma model weights (approx. 5GB).*
 
-### 2. Mobile App
+### 3. Mobile App
 
 ```bash
 cd mobile
 npm install
 npx expo start
-
 ```
 
 *Scan the QR code with the **Expo Go** app on Android/iOS.*
