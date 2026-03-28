@@ -3,7 +3,7 @@ import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { authService } from '../services/auth';
-import { apiService } from '../services/api';
+import { apiService, API_URL } from '../services/api';
 
 type ThemeType = 'light' | 'dark' | 'system';
 
@@ -47,6 +47,8 @@ interface GlobalContextType {
   logout: () => Promise<void>;
   refreshHistory: () => Promise<void>; 
   logHealth: (metrics: any) => Promise<void>;
+  setGoal: (goal: any) => Promise<void>;
+  respondToProposal: (id: string, action: 'schedule' | 'dismiss') => Promise<void>;
   refreshAgentStatus: () => Promise<void>;
   hapticFeedback: (style?: Haptics.ImpactFeedbackStyle) => void;
 }
@@ -128,6 +130,27 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         setAgentStatus((prev: any) => ({ ...prev, latest_insight: resp.latest_insight }));
       }
       hapticFeedback(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  };
+
+  const setGoal = async (goal: any) => {
+    if (token) {
+      await apiService.setHealthGoal(token, goal);
+      await refreshAgentStatus();
+      hapticFeedback(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  };
+
+  const respondToProposal = async (id: string, action: 'schedule' | 'dismiss') => {
+    if (token) {
+      const response = await fetch(`${API_URL}/agent/appointment/${id}/action?action=${action}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        await refreshAgentStatus();
+        hapticFeedback(Haptics.ImpactFeedbackStyle.Medium);
+      }
     }
   };
 
@@ -234,7 +257,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       theme, isHighContrast, isLoggedIn, user, token, isLoading,
       medicalInfo, reports, agentStatus,
       setTheme, setHighContrast, login, register, logout, updateProfile,
-      updateMedicalInfo, refreshHistory, logHealth, refreshAgentStatus, hapticFeedback
+      updateMedicalInfo, refreshHistory, logHealth, setGoal, respondToProposal, refreshAgentStatus, hapticFeedback
     }}>
       {children}
     </GlobalContext.Provider>

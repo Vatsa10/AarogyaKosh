@@ -2,7 +2,7 @@
 import { Platform } from 'react-native';
 
 // Ensure this matches the IP in your services/auth.ts
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 
 export const apiService = {
   

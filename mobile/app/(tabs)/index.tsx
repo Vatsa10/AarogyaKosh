@@ -127,6 +127,47 @@ export default function Dashboard() {
                 </Text>
               )}
             </Surface>
+
+            {/* Suggestions/Proposals */}
+            {agentStatus?.pending_proposals?.length > 0 && (
+              <View style={{ marginTop: 15 }}>
+                <Text variant="labelLarge" style={{ fontWeight: 'bold', marginBottom: 8, color: theme.colors.primary }}>
+                  Agent Suggestions
+                </Text>
+                {agentStatus.pending_proposals.map((prop: any) => (
+                  <Surface key={prop._id} style={styles.proposalSurface} elevation={1}>
+                    <View style={{ flex: 1 }}>
+                      <Text variant="titleSmall" style={{ fontWeight: 'bold' }}>{prop.doctor_specialty} Appointment</Text>
+                      <Text variant="bodySmall" numberOfLines={2}>{prop.reason}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 4 }}>
+                      <IconButton icon="close" size={20} onPress={() => useGlobalState().respondToProposal(prop._id, 'dismiss')} />
+                      <IconButton icon="calendar-check" size={20} iconColor={theme.colors.primary} onPress={() => useGlobalState().respondToProposal(prop._id, 'schedule')} />
+                    </View>
+                  </Surface>
+                ))}
+              </View>
+            )}
+
+            {/* Goals Tracker */}
+            <View style={{ marginTop: 15 }}>
+              <View style={styles.recentHeader}>
+                <Text variant="labelLarge" style={{ fontWeight: 'bold' }}>Active Goals</Text>
+                <Button compact onPress={() => router.push('/goals')}>Manage</Button>
+              </View>
+              {agentStatus?.active_goals?.length > 0 ? (
+                <View style={styles.goalsGrid}>
+                  {agentStatus.active_goals.slice(0, 2).map((goal: any) => (
+                    <View key={goal._id} style={styles.goalPill}>
+                       <Avatar.Icon size={20} icon="target" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.onPrimaryContainer} />
+                       <Text variant="labelSmall" numberOfLines={1} style={{ marginLeft: 6 }}>{goal.goal_type.replace('_', ' ')}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text variant="bodySmall" style={{ color: 'gray', fontStyle: 'italic' }}>No active goals. Set your targets to get tailored advice.</Text>
+              )}
+            </View>
           </Card.Content>
         </Card>
 
@@ -191,5 +232,24 @@ const styles = StyleSheet.create({
   agentCard: { marginBottom: 25, borderRadius: 24, paddingVertical: 5 },
   agentHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   insightSurface: { padding: 15, borderRadius: 16, backgroundColor: 'white' },
+  proposalSurface: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 12, 
+    borderRadius: 12, 
+    backgroundColor: 'white',
+    marginBottom: 8 
+  },
+  goalsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  goalPill: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 8, 
+    paddingHorizontal: 12, 
+    borderRadius: 20, 
+    backgroundColor: '#fff', 
+    borderWidth: 1, 
+    borderColor: '#eee' 
+  },
   emptyState: { padding: 20, alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12 }
 });
