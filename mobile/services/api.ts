@@ -117,6 +117,42 @@ export const apiService = {
         throw new Error('Failed to fetch history');
     }
     return response.json();
+  },
+
+  // --- AGENT INTERFACE ---
+  async logHealthMetrics(token: string, metrics: any) {
+    const response = await fetch(`${API_URL}/agent/log`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(metrics)
+    });
+    if (!response.ok) throw new Error('Failed to log metrics');
+    return response.json();
+  },
+
+  async getAgentDashboard(token: string) {
+    const response = await fetch(`${API_URL}/agent/dashboard`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch dashboard');
+    return response.json();
+  },
+
+  async setHealthGoal(token: string, goal: any) {
+    const response = await fetch(`${API_URL}/agent/goals`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(goal)
+    });
+    if (!response.ok) throw new Error('Failed to set goal');
+    return response.json();
   }
 };
 

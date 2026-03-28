@@ -18,7 +18,7 @@ const HEALTH_QUOTES = [
 export default function Dashboard() {
   const router = useRouter();
   const theme = useTheme();
-  const { user, reports } = useGlobalState();
+  const { user, reports, agentStatus } = useGlobalState();
   const [quote, setQuote] = useState("");
 
   useEffect(() => {
@@ -89,6 +89,47 @@ export default function Dashboard() {
           </Card.Content>
         </Card>
 
+       {/* Agentic AI Section */}
+        <Card style={[styles.agentCard, { backgroundColor: theme.colors.elevation.level2 }]}>
+          <Card.Content>
+            <View style={styles.agentHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                <Avatar.Icon size={36} icon="robot" style={{ backgroundColor: theme.colors.primary }} />
+                <View style={{ marginLeft: 12 }}>
+                  <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>AI Health Agent</Text>
+                  <Text variant="bodySmall" style={{ color: 'gray' }}>Continuous Monitoring</Text>
+                </View>
+              </View>
+              <Button mode="outlined" compact onPress={() => router.push('/checkin')}>Daily Check-In</Button>
+            </View>
+
+            <Surface style={styles.insightSurface} elevation={1}>
+              {agentStatus?.latest_insight ? (
+                <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                    <IconButton 
+                      icon="alert-circle" 
+                      size={20} 
+                      iconColor={
+                        agentStatus.latest_insight.risk_level === 'Critical' ? theme.colors.error : 
+                        agentStatus.latest_insight.risk_level === 'Elevated' ? 'orange' : 'green' 
+                      } 
+                    />
+                    <Text variant="labelLarge" style={{ fontWeight: 'bold' }}>
+                      Status: {agentStatus.latest_insight.risk_level} Pattern
+                    </Text>
+                  </View>
+                  <Text variant="bodyMedium">"{agentStatus.latest_insight.summary}"</Text>
+                </View>
+              ) : (
+                <Text variant="bodyMedium" style={{ color: 'gray', fontStyle: 'italic', textAlign: 'center' }}>
+                  No recent health log. Start your day with a morning check-in for AI analysis.
+                </Text>
+              )}
+            </Surface>
+          </Card.Content>
+        </Card>
+
         {/* Actions Grid */}
         <Text variant="titleMedium" style={styles.sectionTitle}>Actions</Text>
         <View style={styles.grid}>
@@ -147,5 +188,8 @@ const styles = StyleSheet.create({
   gridLabel: { marginTop: 12, fontWeight: 'bold' },
   recentHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   recentCard: { marginBottom: 10, borderRadius: 12 },
+  agentCard: { marginBottom: 25, borderRadius: 24, paddingVertical: 5 },
+  agentHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  insightSurface: { padding: 15, borderRadius: 16, backgroundColor: 'white' },
   emptyState: { padding: 20, alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12 }
 });

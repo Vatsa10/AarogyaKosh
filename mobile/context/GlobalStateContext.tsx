@@ -35,7 +35,8 @@ interface GlobalContextType {
   token: string | null;
   isLoading: boolean;
   medicalInfo: MedicalInfo;
-  reports: HistoryItem[]; // Updated type
+  reports: HistoryItem[]; 
+  agentStatus: any; 
   
   setTheme: (t: ThemeType) => void;
   setHighContrast: (val: boolean) => void;
@@ -44,7 +45,9 @@ interface GlobalContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
-  refreshHistory: () => Promise<void>; // New helper
+  refreshHistory: () => Promise<void>; 
+  logHealth: (metrics: any) => Promise<void>;
+  refreshAgentStatus: () => Promise<void>;
   hapticFeedback: (style?: Haptics.ImpactFeedbackStyle) => void;
 }
 
@@ -61,6 +64,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [medicalInfo, setMedicalInfoState] = useState<MedicalInfo>({
     conditions: '', allergies: '', medications: ''
   });
+  const [agentStatus, setAgentStatus] = useState<any>(null);
 
   useEffect(() => {
     const loadState = async () => {
@@ -106,9 +110,31 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const refreshAgentStatus = async () => {
+    if (token) {
+      try {
+        const data = await apiService.getAgentDashboard(token);
+        setAgentStatus(data);
+      } catch (e) {
+        console.log("Could not fetch agent status:", e);
+      }
+    }
+  };
+
+  const logHealth = async (metrics: any) => {
+    if (token) {
+      const resp = await apiService.logHealthMetrics(token, metrics);
+      if (resp.latest_insight) {
+        setAgentStatus((prev: any) => ({ ...prev, latest_insight: resp.latest_insight }));
+      }
+      hapticFeedback(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  };
+
   useEffect(() => {
     if (token && isLoggedIn) {
-      refreshHistory(); // Fetch on login
+      refreshHistory(); 
+      refreshAgentStatus();
       apiService.getMedicalHistory(token).then(data => {
           const mappedInfo = {
             conditions: data.chronic_condition || '',
@@ -206,9 +232,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   return (
     <GlobalContext.Provider value={{
       theme, isHighContrast, isLoggedIn, user, token, isLoading,
-      medicalInfo, reports,
+      medicalInfo, reports, agentStatus,
       setTheme, setHighContrast, login, register, logout, updateProfile,
-      updateMedicalInfo, refreshHistory, hapticFeedback
+      updateMedicalInfo, refreshHistory, logHealth, refreshAgentStatus, hapticFeedback
     }}>
       {children}
     </GlobalContext.Provider>

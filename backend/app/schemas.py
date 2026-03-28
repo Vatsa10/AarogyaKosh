@@ -47,3 +47,16 @@ class MedicalHistory(BaseModel):
     allergy: str = ""
     current_medication: str = ""
     chronic_condition: str = ""
+
+# ---- HEALTH MONITORING ----
+class HealthLogCreate(BaseModel):
+    sleep_hours: float
+    exercise_minutes: int
+    diet_quality: int
+    stress_level: int
+    notes: Optional[str] = None
+
+class HealthGoalCreate(BaseModel):
+    goal_type: Literal["weight_loss", "stress_reduction", "sleep_target", "exercise_consistency"]
+    target_value: Optional[str] = None
+    target_metric: Optional[float] = None

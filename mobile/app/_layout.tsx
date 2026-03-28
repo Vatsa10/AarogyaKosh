@@ -49,6 +49,7 @@ function RootNavigation() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="scan" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </ThemeProvider>

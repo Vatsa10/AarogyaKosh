@@ -9,6 +9,7 @@ from app.models.user import User
 # CHANGE 1: Import the correct models used in your endpoints
 from app.models.medical_record import MedicalHistoryRecord
 from app.models.history_entry import AppHistoryEntry
+from app.models.health_monitoring import HealthLog, HealthGoal, AIInsight, AppointmentProposal
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,7 +20,7 @@ async def lifespan(app: FastAPI):
     # CHANGE 2: Add MedicalHistoryRecord and AppHistoryEntry to document_models
     await init_beanie(
         database=database, 
-        document_models=[User, MedicalHistoryRecord, AppHistoryEntry]
+        document_models=[User, MedicalHistoryRecord, AppHistoryEntry, HealthLog, HealthGoal, AIInsight, AppointmentProposal]
     )
     
     print(" Connected to MongoDB Atlas")
